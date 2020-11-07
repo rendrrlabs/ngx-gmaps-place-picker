@@ -1,0 +1,24 @@
+{
+  "name": "ngx-gmaps-place-picker",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "author": "Rendrr Devign Labs",
+  "homepage": "https://rendrr.com/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rakcode/ngx-gmaps-place-picker.git"
+  },
+  "peerDependencies": {
+    "@angular/common": "^10.2.0",
+    "@angular/core": "^10.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  }
+}
