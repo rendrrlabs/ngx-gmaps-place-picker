@@ -46,4 +46,4 @@ testem.log
 Thumbs.db
 
 /projects/gmaps-place-picker-example
-.npmrc
+/ngx-gmaps-place-picker/.npmrc
