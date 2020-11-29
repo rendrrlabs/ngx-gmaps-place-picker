@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-
 declare const google: any;
 
 @Component({
@@ -17,6 +16,7 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
 
   @Input() config: any;
   @Output() onLocationChanged = new EventEmitter<any>();
+  @Output() onMapinit = new EventEmitter<any>();
 
   showMapData: boolean = false;
   isUsingCustomInput: boolean = false;
@@ -28,8 +28,7 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
     if(this.config.hasOwnProperty("lat") && this.config.hasOwnProperty("lng") && this.config.hasOwnProperty("advanced_mode")){
       this.showMapData = true;
       //The center location of our map.
-      var centerOfMap = new google.maps.LatLng( 12.9394111, 77.5368767);
-      console.log(this.config, centerOfMap.lat())
+      var centerOfMap = new google.maps.LatLng( this.config.lat, this.config.lng);
       //Map options.
       var options = {
         center: centerOfMap, //Set center.
@@ -71,8 +70,7 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
 
       if(this.config.hasOwnProperty("controls")) {
         let markerControl = this.config.marker;
-        
-        if(markerControl.hasOwnProperty("default")) markerOptions.icon = markerControl.icon;
+        if(markerControl.hasOwnProperty("icon")) markerOptions.icon = markerControl.icon;
         if(markerControl.hasOwnProperty("draggable")) markerOptions.draggable = markerControl.draggable;
         if(markerControl.hasOwnProperty("animation")) {
           switch(markerControl.animation){
@@ -93,33 +91,46 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
     }
   }
 
-  doResponse(response, mode){
+  doResponse(response, mode, isOnInit = false){
     let formatted_address = response.formatted_address;
     let lat = response.geometry.location.lat();
     let lng = response.geometry.location.lng();
     let address_components = response.address_components;
+    let zip_code = response.address_components.find(addr => addr.types[0] === "postal_code").short_name;
+    let state = response.address_components.find(addr => addr.types[0] === "administrative_area_level_1").long_name;
+    let city = response.address_components.find(addr => addr.types[0] === "administrative_area_level_2").long_name;
+    let country = response.address_components.find(addr => addr.types[0] === "country").long_name;
 
     let res = {lat, lng};
 
     if(mode) {
       res['formatted_address'] = formatted_address;
       res['address_components'] = address_components;
-    }
 
-    this.onLocationChanged.emit(res);
+      let addr = {};
+      addr['zip_code'] = zip_code;
+      addr['state'] = state;
+      addr['city'] = city;
+      addr['country'] = country;
+
+      res['address'] = addr;
+    }
+    
+    if(isOnInit) this.onMapinit.emit(res);
+    else this.onLocationChanged.emit(res);
+
   }
 
   initMap(options, markerOptions, mode, customInput){
     console.log(options, marker);
     var map:any = new google.maps.Map(document.getElementById('ngx-gmaps-cotainer'), options);
     markerOptions.map = map;
-    
     var marker:any = marker = new google.maps.Marker(markerOptions);
     
 
     var input = document.getElementById('ngx-gmaps-input');
     if(customInput){
-      input = document.getElementById(customInput);
+      input = document.querySelector(customInput);
       this.isUsingCustomInput = true;
     }
 
@@ -139,6 +150,16 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
         }, (responses) => that.doResponse(responses[0], mode));
     });
 
+    this.ngxGmapsOnInit(marker, mode);
+  }
+
+  ngxGmapsOnInit(marker, mode){
+    let geocoder:any = new google.maps.Geocoder();
+    let that = this;
+    console.log(geocoder.geocode(), "geocoder.geocode()")
+      geocoder.geocode({
+        latLng: marker.getPosition()
+      }, (responses) => that.doResponse(responses[0], mode, true));
   }
 
 }
