@@ -17,6 +17,7 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
   @Input() config: any;
   @Output() onLocationChanged = new EventEmitter<any>();
   @Output() onMapinit = new EventEmitter<any>();
+  @Output() onMapError = new EventEmitter<any>();
 
   showMapData: boolean = false;
   isUsingCustomInput: boolean = false;
@@ -25,7 +26,14 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if(this.config.hasOwnProperty("lat") && this.config.hasOwnProperty("lng") && this.config.hasOwnProperty("advanced_mode")){
+    if(
+      this.config &&
+      this.config.hasOwnProperty("lat") && 
+      this.config.hasOwnProperty("lng") && 
+      this.config.hasOwnProperty("advanced_mode") &&
+      this.config.lat &&
+      this.config.lng
+      ){
       this.showMapData = true;
       //The center location of our map.
       var centerOfMap = new google.maps.LatLng( this.config.lat, this.config.lng);
@@ -88,7 +96,7 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
 
       this.initMap(options, markerOptions, this.config.advanced_mode, customInput);
 
-    }
+    }else this.onMapError.emit(new Error("Invalid Input"));
   }
 
   doResponse(response, mode, isOnInit = false){
