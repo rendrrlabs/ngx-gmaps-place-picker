@@ -15,6 +15,7 @@ declare const google: any;
 export class NgxGmapsPlacePickerComponent implements OnInit {
 
   @Input() config: any;
+  @Input() styles: any;
   @Output() onLocationChanged = new EventEmitter<any>();
   @Output() onMapinit = new EventEmitter<any>();
   @Output() onMapError = new EventEmitter<any>();
@@ -25,7 +26,6 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
     if(
       this.config &&
       this.config.hasOwnProperty("lat") && 
@@ -52,6 +52,8 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
         overviewMapControl: false,
         rotateControl: false
       };
+
+      if(this.styles) options['styles'] = this.styles;
 
       let markerOptions = {
         position: centerOfMap,
@@ -130,7 +132,6 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
   }
 
   initMap(options, markerOptions, mode, customInput){
-    console.log(options, marker);
     var map:any = new google.maps.Map(document.getElementById('ngx-gmaps-cotainer'), options);
     markerOptions.map = map;
     var marker:any = marker = new google.maps.Marker(markerOptions);
@@ -164,7 +165,6 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
   ngxGmapsOnInit(marker, mode){
     let geocoder:any = new google.maps.Geocoder();
     let that = this;
-    console.log(geocoder.geocode(), "geocoder.geocode()")
       geocoder.geocode({
         latLng: marker.getPosition()
       }, (responses) => that.doResponse(responses[0], mode, true));
