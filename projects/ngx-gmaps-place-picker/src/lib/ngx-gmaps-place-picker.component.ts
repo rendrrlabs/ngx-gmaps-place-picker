@@ -106,10 +106,13 @@ export class NgxGmapsPlacePickerComponent implements OnInit {
     let lat = response.geometry.location.lat();
     let lng = response.geometry.location.lng();
     let address_components = response.address_components;
-    let zip_code = response.address_components.find(addr => addr.types[0] === "postal_code").short_name;
-    let state = response.address_components.find(addr => addr.types[0] === "administrative_area_level_1").long_name;
-    let city = response.address_components.find(addr => addr.types[0] === "administrative_area_level_2").long_name;
-    let country = response.address_components.find(addr => addr.types[0] === "country").long_name;
+
+    console.log(response.address_components, "response.address_components");
+
+    let zip_code = response.address_components.find(addr => addr.types[0] === "postal_code")?.short_name;
+    let state = response.address_components.find(addr => addr.types[0] === "administrative_area_level_1")?.long_name;
+    let city = response.address_components.find(addr => addr.types[0] === "administrative_area_level_2")?.long_name;
+    let country = response.address_components.find(addr => addr.types[0] === "country")?.long_name;
 
     let res = {lat, lng};
 
